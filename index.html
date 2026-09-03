@@ -1,461 +1,449 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>魔導書 〜分数の試練〜</title>
-    <style>
-        :root {
-            --bg-color: #160a28; /* 深い紫 */
-            --text-main: #e2d9f3;
-            --magic-green: #00fa9a; /* 魔法陣の緑 */
-            --magic-purple: #9d4edd;
-            --danger: #ff0055;
-            --btn-bg: rgba(30, 15, 50, 0.8);
-        }
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            text-align: center;
-            background-color: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(157, 78, 221, 0.15) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 250, 154, 0.1) 0%, transparent 20%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
-            transition: background-color 0.1s;
-        }
-        #game-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 25px;
-            background: rgba(20, 10, 40, 0.7);
-            border: 2px solid var(--magic-purple);
-            border-radius: 12px;
-            position: relative;
-            box-shadow: 0 0 25px rgba(157, 78, 221, 0.4);
-        }
-        h1 {
-            font-size: 26px;
-            color: var(--magic-green);
-            margin-top: 0;
-            border-bottom: 2px dashed var(--magic-purple);
-            padding-bottom: 10px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--magic-green);
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>化学変化とイオン 暗記ドリル</title>
+<style>
+  :root{
+    --ink:#0A1020;
+    --surface:#141E33;
+    --surface-hi:#1C2A45;
+    --line:#26344F;
+    --plus:#FF3D71;
+    --minus:#2FD3E8;
+    --paper:#EAF0FA;
+    --muted:#7A8CA8;
+    --ok:#4ADE9B;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding:0 20px calc(40px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:560px;margin:0 auto}
 
-        /* 解説・設定 */
-        .info-box {
-            background-color: rgba(0,0,0,0.4);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: left;
-            font-size: 13px;
-            border-left: 4px solid var(--magic-green);
-        }
-        .info-box h4 { margin: 0 0 8px 0; color: var(--magic-green); font-size: 15px; }
-        .info-box ul { padding-left: 20px; margin: 0; }
-        .info-box li { margin-bottom: 4px; }
-        .settings-box { border: 1px solid var(--magic-purple); border-radius: 8px; padding: 15px; margin-bottom: 20px; text-align: left; }
-        h3 { font-size: 14px; margin: 0 0 10px 0; color: #c8b6ff; }
-        .checkbox-group label, .radio-group label { display: inline-block; margin-right: 15px; cursor: pointer; font-size: 15px; margin-bottom: 5px;}
+  /* ---------- hero ---------- */
+  .hero{padding:44px 0 30px;border-bottom:1px solid var(--line)}
+  .equation{
+    font-size:clamp(30px,9vw,46px);
+    font-weight:600;
+    letter-spacing:.02em;
+    line-height:1.25;
+    margin:0 0 14px;
+  }
+  .equation .p{color:var(--plus)}
+  .equation .m{color:var(--minus)}
+  .equation sub{font-size:.55em;vertical-align:-.15em}
+  .equation sup{font-size:.55em;vertical-align:.45em}
+  .hero p{margin:0;color:var(--muted);font-size:14.5px;max-width:44ch}
 
-        /* 分数の表示スタイル（上下に分ける） */
-        .frac {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            vertical-align: middle;
-            margin: 0 5px;
-            line-height: 1.1;
-        }
-        .frac .top {
-            border-bottom: 2px solid currentColor;
-            padding: 0 4px;
-        }
-        .frac .bottom {
-            padding: 0 4px;
-        }
-        .paren { font-weight: normal; margin: 0 2px; }
+  /* ---------- progress ---------- */
+  .meter{margin:26px 0 8px}
+  .meter-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .meter-count{font-size:26px;font-weight:600;letter-spacing:.01em}
+  .meter-count span{font-size:15px;color:var(--muted);font-weight:400}
+  .meter-note{font-size:13px;color:var(--muted)}
+  .bar{height:7px;background:var(--surface);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--minus);border-radius:99px;transition:width .45s cubic-bezier(.2,.7,.3,1)}
 
-        /* ゲーム画面 */
-        #question {
-            font-size: 40px;
-            margin: 30px 0;
-            min-height: 90px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-shadow: 0 0 10px var(--magic-purple);
-            font-weight: bold;
-        }
-        #timer { font-size: 26px; color: var(--magic-green); font-weight: bold; text-shadow: 0 0 8px var(--magic-green); }
-        #score-display { font-size: 20px; color: #c8b6ff; margin-bottom: 10px; }
+  /* ---------- section list ---------- */
+  .list{margin:30px 0 0;padding:0;list-style:none}
+  .row{
+    display:flex;gap:15px;align-items:flex-start;
+    width:100%;text-align:left;
+    background:none;border:0;border-top:1px solid var(--line);
+    color:inherit;font:inherit;
+    padding:17px 2px;cursor:pointer;
+  }
+  .list li:last-child .row{border-bottom:1px solid var(--line)}
+  .row:hover{background:rgba(255,255,255,.028)}
+  .row:focus-visible{outline:2px solid var(--minus);outline-offset:-2px}
+  .slot{
+    flex:0 0 auto;width:62px;
+    font-size:12.5px;color:var(--muted);
+    padding-top:4px;font-variant-numeric:tabular-nums;
+  }
+  .row-main{flex:1 1 auto;min-width:0}
+  .row-title{font-size:16.5px;font-weight:600;margin-bottom:3px}
+  .row-sub{font-size:13px;color:var(--muted)}
+  .tally{
+    flex:0 0 auto;align-self:center;
+    font-size:13.5px;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .tally.full{color:var(--ok)}
 
-        /* 選択肢ボタン */
-        #choices { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 160px; }
-        .choice-btn {
-            flex: 1 1 40%;
-            font-size: 28px;
-            padding: 10px 5px;
-            background: var(--btn-bg);
-            color: white;
-            border: 2px solid var(--magic-purple);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.1s, transform 0.1s;
-        }
-        .choice-btn:active { background: var(--magic-green); color: black; transform: scale(0.95); border-color: var(--magic-green); }
+  .weak{
+    margin-top:28px;width:100%;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    color:var(--paper);font:inherit;font-size:15px;
+    padding:15px;cursor:pointer;text-align:left;
+  }
+  .weak:disabled{opacity:.4;cursor:default}
+  .weak b{font-weight:600}
+  .weak span{color:var(--muted);font-size:13px;display:block;margin-top:2px}
 
-        /* 開始ボタン */
-        .start-btn {
-            font-size: 20px;
-            padding: 15px;
-            background: linear-gradient(135deg, #7b2cbf, #5a189a);
-            color: white;
-            border: 1px solid #9d4edd;
-            border-radius: 50px;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 0 #3c096c;
-        }
-        .start-btn:active { transform: translateY(4px); box-shadow: none; }
+  /* ---------- card view ---------- */
+  .bar-top{display:flex;align-items:center;gap:14px;padding:22px 0 20px}
+  .back{
+    background:none;border:0;color:var(--muted);font:inherit;font-size:14px;
+    padding:6px 0;cursor:pointer;flex:0 0 auto;
+  }
+  .back:hover{color:var(--paper)}
+  .queue{flex:1 1 auto;text-align:right;font-size:13.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 
-        /* リザルト */
-        .atk-label { font-size: 18px; color: #c8b6ff; margin-bottom: 0; }
-        .atk-value { font-size: 72px; color: var(--magic-green); text-shadow: 0 0 20px var(--magic-green); margin: 0; }
-        .rank-badge { font-size: 60px; margin-top: -5px; color: white; font-weight: bold; letter-spacing: 2px;}
-        
-        .detail-box { background: rgba(0,0,0,0.4); padding: 15px; font-size: 14px; text-align: left; border: 1px solid var(--magic-purple); margin: 15px 0; border-radius: 8px; }
-        .detail-item { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 5px 0; }
-        .detail-label { color: #aaa; }
-        .detail-value { color: #fff; font-weight: bold; }
-        .mistake-value { color: var(--danger); font-weight: bold; }
-        
-        .shake { animation: shake 0.2s infinite; }
-        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
-        .hidden { display: none !important; }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:30px 24px;
+    min-height:210px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .q{font-size:19px;font-weight:600;line-height:1.65;margin:0}
+  .q .hint{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:9px}
 
-        /* 魔法エフェクト */
-        .slash { position: absolute; top: 50%; left: 0; width: 100%; height: 5px; background: var(--magic-green); transform: rotate(5deg); opacity: 0; pointer-events: none; box-shadow: 0 0 15px var(--magic-green); }
-        .slash-anim { animation: slashEffect 0.3s ease-out; }
-        @keyframes slashEffect { 0% { opacity: 1; width: 0; } 100% { opacity: 0; width: 100%; } }
-    </style>
+  .a{
+    max-height:0;opacity:0;overflow:hidden;
+    transition:max-height .35s cubic-bezier(.2,.7,.3,1),opacity .3s ease,margin .35s ease;
+  }
+  .a.show{max-height:520px;opacity:1;margin-top:22px}
+  .a-inner{border-top:1px solid var(--line);padding-top:20px}
+  .ans{
+    font-size:clamp(23px,6.4vw,30px);
+    font-weight:600;letter-spacing:.015em;line-height:1.45;
+    word-break:break-word;
+  }
+  .ans sub{font-size:.6em;vertical-align:-.15em}
+  .ans sup{font-size:.6em;vertical-align:.42em}
+  .ans .p{color:var(--plus)}
+  .ans .m{color:var(--minus)}
+  .note{font-size:14px;color:var(--muted);margin-top:14px;line-height:1.7}
+
+  .actions{display:flex;gap:11px;margin-top:20px}
+  .btn{
+    flex:1 1 0;border-radius:12px;border:1px solid var(--line);
+    background:var(--surface-hi);color:var(--paper);
+    font:inherit;font-size:16px;font-weight:600;
+    padding:16px 10px;cursor:pointer;
+  }
+  .btn:hover{background:#233355}
+  .btn:focus-visible{outline:2px solid var(--minus);outline-offset:2px}
+  .btn-reveal{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  .btn-ok{border-color:rgba(74,222,155,.5);color:var(--ok)}
+  .btn-again{color:var(--muted)}
+
+  .done-panel{padding:60px 0;text-align:center}
+  .done-panel h2{font-size:22px;margin:0 0 10px;font-weight:600}
+  .done-panel p{color:var(--muted);font-size:15px;margin:0 0 26px}
+
+  .hidden{display:none}
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+</style>
 </head>
 <body>
+<div class="wrap">
 
-<div id="game-container">
-    <div id="slash-line" class="slash"></div>
-
-    <div id="start-screen">
-        <h1>魔導書 〜分数の試練〜</h1>
-        
-        <div class="info-box">
-            <h4>【魔術の心得】</h4>
-            <ul>
-                <li>分数の四則演算を30秒間で解き明かせ。</li>
-                <li>すべての答えは<span style="color:var(--magic-green);">「約分」</span>された形になっている。</li>
-                <li>「負の数（マイナス）」を解放すると、中学生レベルの完全な試練となる。</li>
-                <li><span style="color:var(--danger); font-weight:bold;">【掟】間違えると、持ち時間が1秒減少する。</span></li>
-            </ul>
-        </div>
-
-        <div class="settings-box">
-            <h3>使用する魔法（計算）</h3>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="op-add" checked> ＋</label>
-                <label><input type="checkbox" id="op-sub" checked> －</label>
-                <label><input type="checkbox" id="op-mul" checked> ×</label>
-                <label><input type="checkbox" id="op-div" checked> ÷</label>
-            </div>
-            <br>
-            <h3>闇の魔力（マイナスの数）</h3>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="use-negative"> 負の数を混ぜる</label>
-            </div>
-            <br>
-            <h3>標的数（選択肢）</h3>
-            <div class="radio-group">
-                <label><input type="radio" name="choiceCount" value="2"> 2</label>
-                <label><input type="radio" name="choiceCount" value="3"> 3</label>
-                <label><input type="radio" name="choiceCount" value="4" checked> 4</label>
-            </div>
-        </div>
-        <button class="start-btn" onclick="startGame()">詠唱開始！</button>
+  <!-- HOME -->
+  <div id="home">
+    <div class="hero">
+      <div class="equation">
+        H<sup class="p">+</sup> + OH<sup class="m">−</sup> → H<sub>2</sub>O
+      </div>
+      <p>この単元は、＋と−が釣り合うかどうかで全部決まります。66問。順番どおりに進めれば、65点の土台ができます。</p>
     </div>
 
-    <div id="game-screen" class="hidden">
-        <div id="timer">残り時間：30</div>
-        <div id="score-display">詠唱成功：0</div>
-        <div id="question"></div>
-        <div id="choices"></div>
+    <div class="meter">
+      <div class="meter-top">
+        <div class="meter-count"><b id="doneN">0</b><span> / 66問できた</span></div>
+        <div class="meter-note" id="meterNote">上から順に</div>
+      </div>
+      <div class="bar"><i id="barFill"></i></div>
     </div>
 
-    <div id="result-screen" class="hidden">
-        <p class="atk-label">ー 総合魔力 ー</p>
-        <h2 id="final-atk" class="atk-value">0</h2>
-        <div id="rank-display" class="rank-badge">-</div>
-        
-        <div class="detail-box">
-            <div class="detail-item"><span class="detail-label">プレイ日時</span><span id="res-datetime" class="detail-value"></span></div>
-            <div class="detail-item"><span class="detail-label">正解数</span><span id="res-count" class="detail-value"></span></div>
-            <div class="detail-item"><span class="detail-label">魔力暴走（ミス）</span><span id="res-mistakes" class="mistake-value"></span></div>
-            <div class="detail-item"><span class="detail-label">計算設定</span><span id="res-ops" class="detail-value"></span></div>
-            <div class="detail-item"><span class="detail-label">連続プレイ回数</span><span id="res-playcount" class="detail-value" style="color:var(--magic-green)"></span></div>
+    <ul class="list" id="sectionList"></ul>
+
+    <button class="weak" id="weakBtn" disabled>
+      <b>まちがえた問題だけ復習</b>
+      <span id="weakNote">「もう一度」を押した問題がここに集まります</span>
+    </button>
+  </div>
+
+  <!-- SESSION -->
+  <div id="session" class="hidden">
+    <div class="bar-top">
+      <button class="back" id="backBtn">← 一覧</button>
+      <div class="queue" id="queueInfo"></div>
+    </div>
+
+    <div id="cardArea">
+      <div class="card">
+        <p class="q" id="qText"></p>
+        <div class="a" id="aBox">
+          <div class="a-inner">
+            <div class="ans" id="aText"></div>
+            <div class="note" id="aNote"></div>
+          </div>
         </div>
-
-        <button class="start-btn" onclick="retryGame()">再挑戦！</button>
-        <p style="margin-top:15px; color:#c8b6ff; cursor:pointer; text-decoration:underline; font-size:14px;" onclick="location.reload()">設定に戻る</p>
+      </div>
+      <div class="actions" id="actions"></div>
     </div>
+
+    <div id="donePanel" class="done-panel hidden">
+      <h2 id="doneTitle"></h2>
+      <p id="doneMsg"></p>
+      <button class="btn btn-reveal" id="doneBack" style="max-width:220px;margin:0 auto">一覧にもどる</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
-    let score = 0;
-    let mistakeCount = 0;
-    let timeLeft = 30;
-    let correctAnswerObj; 
-    let timerId;
-    let activeOps = [];
-    let numChoices = 4;
-    let useNegative = false;
-    let totalPlayCount = 0;
+const P = s => '<span class="p">'+s+'</span>';
+const M = s => '<span class="m">'+s+'</span>';
 
-    // 最大公約数を求める（約分用）
-    function gcd(a, b) {
-        a = Math.abs(a); b = Math.abs(b);
-        return b === 0 ? a : gcd(b, a % b);
-    }
+const SECTIONS = [
+  {
+    id:'ion', slot:'0–15分', title:'イオンの化学式', sub:'すべての土台。ここが穴だと後が崩れる',
+    items:[
+      {q:'水素イオン', a:'H'+P('<sup>+</sup>')},
+      {q:'ナトリウムイオン', a:'Na'+P('<sup>+</sup>')},
+      {q:'カリウムイオン', a:'K'+P('<sup>+</sup>')},
+      {q:'アンモニウムイオン', a:'NH<sub>4</sub>'+P('<sup>+</sup>')},
+      {q:'銅イオン', a:'Cu'+P('<sup>2+</sup>')},
+      {q:'亜鉛イオン', a:'Zn'+P('<sup>2+</sup>')},
+      {q:'マグネシウムイオン', a:'Mg'+P('<sup>2+</sup>')},
+      {q:'カルシウムイオン', a:'Ca'+P('<sup>2+</sup>')},
+      {q:'バリウムイオン', a:'Ba'+P('<sup>2+</sup>')},
+      {q:'塩化物イオン', a:'Cl'+M('<sup>−</sup>'), n:'「塩素イオン」ではなく塩化物イオン'},
+      {q:'水酸化物イオン', a:'OH'+M('<sup>−</sup>'), n:'OとHの順番に注意'},
+      {q:'硝酸イオン', a:'NO<sub>3</sub>'+M('<sup>−</sup>')},
+      {q:'硫酸イオン', a:'SO<sub>4</sub>'+M('<sup>2−</sup>'), n:'−が2つなのはこれだけ'}
+    ]
+  },
+  {
+    id:'denri', slot:'15–30分', title:'電離を表す式', sub:'右辺の＋と−を同じ数にそろえる',
+    items:[
+      {q:'塩化水素（塩酸）の電離', a:'HCl → H'+P('<sup>+</sup>')+' + Cl'+M('<sup>−</sup>')},
+      {q:'塩化ナトリウムの電離', a:'NaCl → Na'+P('<sup>+</sup>')+' + Cl'+M('<sup>−</sup>')},
+      {q:'水酸化ナトリウムの電離', a:'NaOH → Na'+P('<sup>+</sup>')+' + OH'+M('<sup>−</sup>')},
+      {q:'硫酸の電離', a:'H<sub>2</sub>SO<sub>4</sub> → 2H'+P('<sup>+</sup>')+' + SO<sub>4</sub>'+M('<sup>2−</sup>'), n:'SO₄の−2に合わせてH⁺が2個'},
+      {q:'塩化銅の電離', a:'CuCl<sub>2</sub> → Cu'+P('<sup>2+</sup>')+' + 2Cl'+M('<sup>−</sup>'), n:'Cu²⁺の＋2に合わせてCl⁻が2個'},
+      {q:'水酸化バリウムの電離', a:'Ba(OH)<sub>2</sub> → Ba'+P('<sup>2+</sup>')+' + 2OH'+M('<sup>−</sup>'), n:'カッコの外の2はOH全体にかかる'}
+    ]
+  },
+  {
+    id:'chuwa', slot:'30–50分', title:'中和の化学反応式', sub:'酸＋アルカリ→塩＋水。5本を型で覚える',
+    items:[
+      {q:'塩酸 ＋ 水酸化ナトリウム', a:'HCl + NaOH → NaCl + H<sub>2</sub>O', n:'できる塩は塩化ナトリウム。これは絶対に落とせない'},
+      {q:'硫酸 ＋ 水酸化バリウム', a:'H<sub>2</sub>SO<sub>4</sub> + Ba(OH)<sub>2</sub> → BaSO<sub>4</sub> + 2H<sub>2</sub>O', n:'硫酸バリウムは水にとけず白い沈殿。イオンが減るので電流が流れにくくなる'},
+      {q:'硫酸 ＋ 水酸化ナトリウム', a:'H<sub>2</sub>SO<sub>4</sub> + 2NaOH → Na<sub>2</sub>SO<sub>4</sub> + 2H<sub>2</sub>O', n:'SO₄の−2にNa⁺が2個必要 → NaOHも2個 → 水も2個'},
+      {q:'塩酸 ＋ 水酸化カルシウム', a:'2HCl + Ca(OH)<sub>2</sub> → CaCl<sub>2</sub> + 2H<sub>2</sub>O', n:'Ca²⁺の＋2にCl⁻が2個必要'},
+      {q:'硝酸 ＋ 水酸化ナトリウム', a:'HNO<sub>3</sub> + NaOH → NaNO<sub>3</sub> + H<sub>2</sub>O'}
+    ]
+  },
+  {
+    id:'yougo', slot:'50–65分', title:'用語25問', sub:'先生が配ったプリントそのまま。配点効率が最も高い',
+    items:[
+      {q:'塩化ナトリウムや塩化水素のように、水にとけると水溶液に電流が流れる物質を何というか。', a:'電解質'},
+      {q:'砂糖やエタノールのように、水にとけても水溶液に電流が流れない物質を何というか。', a:'非電解質'},
+      {q:'同じ元素で、中性子の数が異なる原子を何というか。', a:'同位体'},
+      {q:'原子が電気を帯びたものを何というか。', a:'イオン'},
+      {q:'イオンのうち、＋の電気を帯びたものを何というか。', a:'陽イオン'},
+      {q:'イオンのうち、−の電気を帯びたものを何というか。', a:'陰イオン'},
+      {q:'電解質が水にとけて、陽イオンと陰イオンに分かれることを何というか。', a:'電離'},
+      {q:'化学エネルギーを電気エネルギーに変換してとり出す装置を何というか。', a:'電池（化学電池）'},
+      {q:'充電できない電池を何というか。', a:'一次電池'},
+      {q:'充電できる電池を何というか。', a:'二次電池（蓄電池）'},
+      {q:'水の電気分解と逆の化学変化を利用して、電気エネルギーをとり出すしくみを何というか。', a:'燃料電池'},
+      {q:'水溶液中で電離して、水素イオンを生じる物質を何というか。', a:'酸'},
+      {q:'水溶液中で電離して、水酸化物イオンを生じる物質を何というか。', a:'アルカリ'},
+      {q:'水溶液の性質によって色が変わる薬品を何というか。', a:'指示薬'},
+      {q:'酸性・アルカリ性の強さを表す数値を何というか。', a:'pH'},
+      {q:'pHの値が7の水溶液の性質は何か。', a:'中性'},
+      {q:'BTB溶液は、酸性で何色になるか。', a:'黄色'},
+      {q:'フェノールフタレイン溶液は、アルカリ性で何色になるか。', a:'赤色'},
+      {q:'酸の水溶液とアルカリの水溶液を混ぜたときに起こる、たがいの性質を打ち消し合う反応を何というか。', a:'中和'},
+      {q:'アルカリの陽イオンと酸の陰イオンが結びついてできる物質を何というか。', a:'塩（えん）', n:'食塩のことではない。読み方も答えられるように'},
+      {q:'うすい塩酸とうすい水酸化ナトリウム水溶液の中和では、何という塩ができるか。', a:'塩化ナトリウム'},
+      {q:'ナトリウムイオンを化学式で書きなさい。', a:'Na'+P('<sup>+</sup>')},
+      {q:'水酸化物イオンを化学式で書きなさい。', a:'OH'+M('<sup>−</sup>')},
+      {q:'水酸化ナトリウムの電離を表す式を書きなさい。', a:'NaOH → Na'+P('<sup>+</sup>')+' + OH'+M('<sup>−</sup>')},
+      {q:'うすい塩酸とうすい水酸化ナトリウム水溶液の中和を化学反応式で表しなさい。', a:'HCl + NaOH → NaCl + H<sub>2</sub>O'}
+    ]
+  },
+  {
+    id:'shiji', slot:'65–72分', title:'指示薬と色', sub:'暗記だけで取れる。落とすともったいない',
+    items:[
+      {q:'BTB溶液　酸性・中性・アルカリ性の色は', a:'黄　→　緑　→　青'},
+      {q:'フェノールフタレイン溶液の色は', a:'酸性・中性は無色／アルカリ性は赤'},
+      {q:'青色リトマス紙はどんなときに変化するか', a:'酸性で赤に変わる'},
+      {q:'赤色リトマス紙はどんなときに変化するか', a:'アルカリ性で青に変わる'},
+      {q:'マグネシウムリボンを入れるとどうなるか', a:'酸性なら水素が発生する'},
+      {q:'酸性の正体は何イオンか', a:'水素イオン H'+P('<sup>+</sup>')},
+      {q:'アルカリ性の正体は何イオンか', a:'水酸化物イオン OH'+M('<sup>−</sup>')}
+    ]
+  },
+  {
+    id:'denchi', slot:'72–85分', title:'電池と電気分解', sub:'記述で出るならここ。文で言えるように',
+    items:[
+      {q:'ダニエル電池の−極は何板か。そこで起こる変化を式で。', a:'亜鉛板　Zn → Zn'+P('<sup>2+</sup>')+' + 2e'+M('<sup>−</sup>'), n:'亜鉛板は溶けて細くなる'},
+      {q:'ダニエル電池の＋極は何板か。そこで起こる変化を式で。', a:'銅板　Cu'+P('<sup>2+</sup>')+' + 2e'+M('<sup>−</sup>')+' → Cu', n:'銅が付着して太くなる'},
+      {q:'ダニエル電池で電子はどちら向きに流れるか。', a:'亜鉛板 → 導線 → 銅板', n:'電流の向きはこの逆'},
+      {q:'ダニエル電池のセロハンの役割を書きなさい。', a:'2つの水溶液がすぐに混ざるのを防ぎ、イオンを通して電気のかたよりをなくすため。', n:'記述の最有力。文ごと覚える'},
+      {q:'電池になるための条件は。', a:'2種類のちがう金属を、電解質の水溶液に入れる。'},
+      {q:'マグネシウム・亜鉛・銅を、イオンになりやすい順に。', a:'マグネシウム ＞ 亜鉛 ＞ 銅'},
+      {q:'塩化銅水溶液の電気分解を化学反応式で。', a:'CuCl<sub>2</sub> → Cu + Cl<sub>2</sub>'},
+      {q:'塩化銅水溶液の電気分解で、陰極と陽極で何が起こるか。', a:'陰極に赤色の銅が付着／陽極から塩素が発生', n:'塩素は刺激臭・プールの消毒のにおい・漂白作用'},
+      {q:'陽極で発生した気体が予想より少ないのはなぜか。', a:'塩素は水にとけやすいから。', n:'記述で頻出'},
+      {q:'燃料電池で起こる反応を化学反応式で。', a:'2H<sub>2</sub> + O<sub>2</sub> → 2H<sub>2</sub>O', n:'水しかできないので環境への影響が少ない'}
+    ]
+  }
+];
 
-    // 分数を約分してオブジェクトで返す
-    function simplify(n, d) {
-        if (d === 0) return {n: 0, d: 1};
-        let g = gcd(n, d);
-        n /= g; d /= g;
-        if (d < 0) { n = -n; d = -d; }
-        return {n: n, d: d};
-    }
+/* ---- build flat index ---- */
+const ALL = [];
+SECTIONS.forEach(s => s.items.forEach((it,i)=>{
+  it.id = s.id+'-'+i; it.sec = s.id; ALL.push(it);
+}));
+const TOTAL = ALL.length;
 
-    // 分数をHTML（見た目）に変換する
-    function getFracHTML(n, d) {
-        if (n === 0) return "0";
-        if (d === 1) return n.toString();
-        let sign = n < 0 ? "- " : "";
-        let absN = Math.abs(n);
-        return `${sign}<div class="frac"><span class="top">${absN}</span><span class="bottom">${d}</span></div>`;
-    }
+const state = { done:new Set(), missed:new Set() };
+let queue = [], current = null, revealed = false, sessionLabel = '', sessionCount = 0;
 
-    // 負の数の場合はカッコをつける
-    function renderOperand(n, d, isSecond) {
-        let html = getFracHTML(n, d);
-        if (isSecond && n < 0) {
-            return `<span class="paren">(</span> ${html} <span class="paren">)</span>`;
-        }
-        return html;
-    }
+const $ = id => document.getElementById(id);
 
-    function startGame() {
-        activeOps = [];
-        if (document.getElementById('op-add').checked) activeOps.push('+');
-        if (document.getElementById('op-sub').checked) activeOps.push('-');
-        if (document.getElementById('op-mul').checked) activeOps.push('×');
-        if (document.getElementById('op-div').checked) activeOps.push('÷');
+/* ---------- home ---------- */
+function renderHome(){
+  $('home').classList.remove('hidden');
+  $('session').classList.add('hidden');
 
-        if (activeOps.length === 0) { alert('計算を選んでください。'); return; }
+  $('doneN').textContent = state.done.size;
+  $('barFill').style.width = (state.done.size/TOTAL*100)+'%';
+  $('meterNote').textContent = state.done.size===TOTAL ? '全部おわった' : '上から順に';
 
-        useNegative = document.getElementById('use-negative').checked;
-        numChoices = parseInt(document.querySelector('input[name="choiceCount"]:checked').value);
-        totalPlayCount++;
+  $('sectionList').innerHTML = SECTIONS.map(s=>{
+    const d = s.items.filter(it=>state.done.has(it.id)).length;
+    const full = d===s.items.length;
+    return `<li><button class="row" data-sec="${s.id}">
+      <span class="slot">${s.slot}</span>
+      <span class="row-main">
+        <span class="row-title">${s.title}</span>
+        <span class="row-sub">${s.sub}</span>
+      </span>
+      <span class="tally${full?' full':''}">${d}/${s.items.length}</span>
+    </button></li>`;
+  }).join('');
 
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
-        document.getElementById('result-screen').classList.add('hidden');
-        
-        score = 0;
-        mistakeCount = 0;
-        timeLeft = 30;
-        document.getElementById('timer').textContent = `残り時間：${timeLeft}`;
-        document.getElementById('score-display').textContent = `詠唱成功：${score}`;
-        
-        nextQuestion();
-        
-        timerId = setInterval(() => {
-            timeLeft--;
-            if (timeLeft < 0) timeLeft = 0;
-            document.getElementById('timer').textContent = `残り時間：${timeLeft}`;
-            
-            if (timeLeft <= 5 && timeLeft > 0) document.body.classList.add('shake');
-            else document.body.classList.remove('shake');
-            
-            if (timeLeft <= 0) endGame();
-        }, 1000);
-    }
+  document.querySelectorAll('.row').forEach(b=>{
+    b.addEventListener('click',()=>startSection(b.dataset.sec));
+  });
 
-    function retryGame() { startGame(); }
+  const weak = ALL.filter(it=>state.missed.has(it.id));
+  const wb = $('weakBtn');
+  wb.disabled = weak.length===0;
+  $('weakNote').textContent = weak.length===0
+    ? '「もう一度」を押した問題がここに集まります'
+    : weak.length+'問たまっています';
+}
 
-    function getRandN() {
-        let n = Math.floor(Math.random() * 5) + 1; // 1~5
-        if (useNegative && Math.random() > 0.5) n = -n;
-        return n;
-    }
-    function getRandD() {
-        return Math.floor(Math.random() * 5) + 2; // 2~6
-    }
+/* ---------- session ---------- */
+function startSection(id){
+  const s = SECTIONS.find(x=>x.id===id);
+  queue = s.items.filter(it=>!state.done.has(it.id)).slice();
+  if(queue.length===0) queue = s.items.slice();
+  sessionLabel = s.title;
+  beginSession();
+}
+function startWeak(){
+  queue = ALL.filter(it=>state.missed.has(it.id));
+  sessionLabel = 'まちがえた問題';
+  beginSession();
+}
+function beginSession(){
+  sessionCount = queue.length;
+  $('home').classList.add('hidden');
+  $('session').classList.remove('hidden');
+  $('donePanel').classList.add('hidden');
+  $('cardArea').classList.remove('hidden');
+  next();
+}
 
-    function nextQuestion() {
-        const op = activeOps[Math.floor(Math.random() * activeOps.length)];
-        
-        let n1 = getRandN(); let d1 = getRandD();
-        let n2 = getRandN(); let d2 = getRandD();
-        
-        // 簡単にするため、最初の分数は約分済みにする
-        let f1 = simplify(n1, d1); n1 = f1.n; d1 = f1.d;
-        let f2 = simplify(n2, d2); n2 = f2.n; d2 = f2.d;
+function next(){
+  if(queue.length===0){ finish(); return; }
+  current = queue[0];
+  revealed = false;
+  $('qText').innerHTML = current.q;
+  $('aText').innerHTML = current.a;
+  $('aNote').innerHTML = current.n || '';
+  $('aNote').style.display = current.n ? 'block' : 'none';
+  $('aBox').classList.remove('show');
+  $('queueInfo').textContent = sessionLabel+'　のこり '+queue.length+'問';
+  $('actions').innerHTML = '<button class="btn btn-reveal" id="revealBtn">答えを見る</button>';
+  $('revealBtn').addEventListener('click', reveal);
+  $('revealBtn').focus();
+}
 
-        let rn = 0, rd = 1;
+function reveal(){
+  revealed = true;
+  $('aBox').classList.add('show');
+  $('actions').innerHTML =
+    '<button class="btn btn-again" id="againBtn">もう一度</button>'+
+    '<button class="btn btn-ok" id="okBtn">できた</button>';
+  $('againBtn').addEventListener('click', ()=>grade(false));
+  $('okBtn').addEventListener('click', ()=>grade(true));
+  $('okBtn').focus();
+}
 
-        if (op === '+') {
-            rn = n1 * d2 + n2 * d1; rd = d1 * d2;
-        } else if (op === '-') {
-            rn = n1 * d2 - n2 * d1; rd = d1 * d2;
-        } else if (op === '×') {
-            rn = n1 * n2; rd = d1 * d2;
-        } else if (op === '÷') {
-            rn = n1 * d2; rd = d1 * n2;
-        }
+function grade(ok){
+  const it = queue.shift();
+  if(ok){
+    state.done.add(it.id);
+    state.missed.delete(it.id);
+  }else{
+    state.done.delete(it.id);
+    state.missed.add(it.id);
+    queue.push(it);
+  }
+  next();
+}
 
-        correctAnswerObj = simplify(rn, rd);
-        
-        let qText = `${renderOperand(n1, d1, false)} <span style="margin: 0 10px;">${op}</span> ${renderOperand(n2, d2, true)}`;
-        document.getElementById('question').innerHTML = qText;
+function finish(){
+  $('cardArea').classList.add('hidden');
+  $('donePanel').classList.remove('hidden');
+  $('queueInfo').textContent = '';
+  $('doneTitle').textContent = sessionLabel+'　クリア';
+  const left = TOTAL - state.done.size;
+  $('doneMsg').textContent = left===0
+    ? '66問すべて言えるようになりました。あとは紙に手で書いて確かめるだけ。'
+    : 'のこり'+left+'問。次のまとまりへ。';
+}
 
-        // 選択肢生成
-        let options = [correctAnswerObj];
-        let loopCount = 0;
-        let correctVal = correctAnswerObj.n / correctAnswerObj.d;
+/* ---------- events ---------- */
+$('backBtn').addEventListener('click', renderHome);
+$('doneBack').addEventListener('click', renderHome);
+$('weakBtn').addEventListener('click', startWeak);
 
-        while (options.length < numChoices && loopCount < 50) {
-            loopCount++;
-            let trap = Math.random();
-            let dn = correctAnswerObj.n + (Math.floor(Math.random() * 5) - 2);
-            let dd = correctAnswerObj.d + (Math.floor(Math.random() * 5) - 2);
+document.addEventListener('keydown', e=>{
+  if($('session').classList.contains('hidden')) return;
+  if($('cardArea').classList.contains('hidden')) return;
+  if(e.key===' '||e.key==='Enter'){
+    if(!revealed){ e.preventDefault(); reveal(); }
+  }else if(revealed && (e.key==='1')){ grade(false); }
+  else if(revealed && (e.key==='2')){ grade(true); }
+});
 
-            // 通分忘れのトラップ
-            if (op === '+' && trap < 0.2) { dn = n1 + n2; dd = d1 + d2; }
-            if (op === '-' && trap < 0.2) { dn = n1 - n2; dd = Math.abs(d1 - d2) || 1; }
-            // 符号のトラップ
-            if (trap > 0.8 && correctAnswerObj.n !== 0) { dn = -correctAnswerObj.n; dd = correctAnswerObj.d; }
-            // 逆数のトラップ
-            if (trap > 0.6 && trap <= 0.8 && correctAnswerObj.n !== 0) { dn = correctAnswerObj.d; dd = correctAnswerObj.n; }
-
-            if (dd === 0) continue;
-            let dummyObj = simplify(dn, dd);
-            let dummyVal = dummyObj.n / dummyObj.d;
-
-            // 被りチェック
-            let isUnique = true;
-            for(let o of options) {
-                if (o.n / o.d === dummyVal) isUnique = false;
-            }
-            if (isUnique) options.push(dummyObj);
-        }
-
-        options.sort(() => Math.random() - 0.5);
-        const choicesDiv = document.getElementById('choices');
-        choicesDiv.innerHTML = '';
-        
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerHTML = getFracHTML(opt.n, opt.d);
-            
-            btn.onclick = () => {
-                if (opt.n === correctAnswerObj.n && opt.d === correctAnswerObj.d) {
-                    score++;
-                    document.getElementById('score-display').textContent = `詠唱成功：${score}`;
-                    triggerSlash();
-                    nextQuestion();
-                } else {
-                    mistakeCount++;
-                    timeLeft -= 1;
-                    if (timeLeft < 0) timeLeft = 0;
-                    document.getElementById('timer').textContent = `残り時間：${timeLeft}`;
-                    
-                    document.body.style.backgroundColor = 'var(--danger)';
-                    setTimeout(() => {
-                        document.body.style.backgroundColor = 'var(--bg-color)';
-                    }, 100);
-                    
-                    if (timeLeft <= 0) endGame();
-                }
-            };
-            choicesDiv.appendChild(btn);
-        });
-    }
-
-    function triggerSlash() {
-        const slash = document.getElementById('slash-line');
-        slash.classList.remove('slash-anim');
-        void slash.offsetWidth;
-        slash.classList.add('slash-anim');
-    }
-
-    function endGame() {
-        clearInterval(timerId);
-        document.body.classList.remove('shake');
-        document.getElementById('game-screen').classList.add('hidden');
-        document.getElementById('result-screen').classList.remove('hidden');
-
-        const now = new Date();
-        const dateStr = `${now.getMonth()+1}月${now.getDate()}日 ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-        // 分数は難しいのでベーススコアを高めに
-        let choiceMult = 1 + (numChoices - 2) * 0.3;
-        let opMult = activeOps.length * 0.2 + (useNegative ? 0.5 : 0);
-        let finalAtk = Math.floor(score * 200 * choiceMult * (1 + opMult));
-        
-        let currentAtk = 0;
-        let step = Math.ceil(finalAtk / 30);
-        if (step === 0) step = 1;
-        let counter = setInterval(() => {
-            currentAtk += step;
-            if (currentAtk >= finalAtk) {
-                currentAtk = finalAtk;
-                clearInterval(counter);
-                showRank(finalAtk);
-            }
-            document.getElementById('final-atk').textContent = currentAtk.toLocaleString();
-        }, 30);
-
-        document.getElementById('res-datetime').textContent = dateStr;
-        document.getElementById('res-count').textContent = `${score} 回`;
-        document.getElementById('res-mistakes').textContent = `${mistakeCount} 回`;
-        
-        let opsStr = activeOps.join(' ');
-        if (useNegative) opsStr += " (負の数あり)";
-        document.getElementById('res-ops').textContent = opsStr;
-        document.getElementById('res-playcount').textContent = `${totalPlayCount} 回目`;
-    }
-
-    function showRank(atk) {
-        let rank = '見習い'; let color = '#aaa';
-        if (atk >= 8000) { rank = '魔法神'; color = 'var(--magic-green)'; }
-        else if (atk >= 6000) { rank = '賢者'; color = '#ffd700'; }
-        else if (atk >= 4000) { rank = '大魔導士'; color = '#ff00ff'; }
-        else if (atk >= 2000) { rank = '魔術師'; color = '#00e5ff'; }
-        
-        const rd = document.getElementById('rank-display');
-        rd.textContent = rank;
-        rd.style.color = color;
-        rd.style.textShadow = `0 0 20px ${color}`;
-    }
+renderHome();
 </script>
 </body>
 </html>
